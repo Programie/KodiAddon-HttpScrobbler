@@ -34,7 +34,8 @@ class PlayerMonitor(xbmc.Player):
             full_data = full_data | {
                 "tvShowTitle": self.video_info.getTVShowTitle(),
                 "season": self.video_info.getSeason(),
-                "episode": self.video_info.getEpisode()
+                "episode": self.video_info.getEpisode(),
+                "firstAired": self.video_info.getFirstAiredAsW3C()
             }
 
         return full_data
