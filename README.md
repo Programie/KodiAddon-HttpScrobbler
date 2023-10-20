@@ -2,6 +2,8 @@
 
 This addon for Kodi provides a simple scrobbler sending requests for movies and episodes to any HTTP endpoint. The data is sent as JSON using a POST request.
 
+Work on a [backend for this addon](https://github.com/Programie/Tracky) is currently in progress.
+
 ## Data structure
 
 The following examples provide the usual structure which will be used for sending the data to the endpoint.
