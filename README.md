@@ -8,18 +8,21 @@ Work on a [backend for this addon](https://github.com/Programie/Tracky) is curre
 
 The following examples provide the usual structure which will be used for sending the data to the endpoint.
 
-Not all of those properties might be set in every request as they might not be available for the media content being played back. Especially the `originalTitle` property is only set if Kodi shows an alternative title (i.e. if the original one is in a different language).
+Not all of those properties might be set in every request as they might not be available for the media content being played back.
 
 **Movies**
 
 ```json
 {
+  "event": "start",
   "dbId": 123,
   "title": "Back to the Future",
-  "originalTitle": "",
   "mediaType": "movie",
-  "imdbId": "tt0088763",
-  "year": 1985
+  "year": 1985,
+  "premiered": "",
+  "uniqueIds": {
+    "imdb": "tt0088763"
+  }
 }
 ```
 
@@ -27,12 +30,14 @@ Not all of those properties might be set in every request as they might not be a
 
 ```json
 {
+  "event": "start",
   "dbId": 1234,
   "title": "Member Berries",
-  "originalTitle": "",
   "mediaType": "episode",
-  "imdbId": "tt4197088",
   "year": 2016,
+  "uniqueIds": {
+    "tvdb": "75897"
+  },
   "tvShowTitle": "South Park",
   "season": 20,
   "episode": 1,
