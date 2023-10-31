@@ -62,9 +62,11 @@ class PlayerMonitor(xbmc.Player):
 
         xbmc.log("Sending data to URL {}: {}".format(url, json.dumps(json_data)), level=xbmc.LOGINFO)
 
-        response = requests.post(url, json=json_data, auth=auth)
-        if not response.ok:
-            xbmc.log("Request failed for URL {}: {}".format(response.url, response.reason), level=xbmc.LOGERROR)
+        try:
+            response = requests.post(url, json=json_data, auth=auth)
+            response.raise_for_status()
+        except Exception as exception:
+            xbmc.log("Request failed for URL {}: {}".format(url, str(exception)), level=xbmc.LOGERROR)
             self.show_message("HTTP request failed!")
 
     def onAVStarted(self):
