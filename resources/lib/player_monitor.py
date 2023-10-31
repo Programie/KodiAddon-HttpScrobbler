@@ -28,7 +28,7 @@ class PlayerMonitor(xbmc.Player):
             "title": self.video_info.get("label"),
             "mediaType": self.video_info.get("type"),
             "year": self.video_info.get("year"),
-            "uniqueIds": fix_unique_ids(self.video_info)
+            "uniqueIds": fix_unique_ids(self.video_info.get("uniqueid", {}), self.video_info.get("type"))
         }
 
         if full_data["mediaType"] == "episode":
@@ -36,7 +36,8 @@ class PlayerMonitor(xbmc.Player):
                 "tvShowTitle": self.video_info.get("showtitle"),
                 "season": self.video_info.get("season"),
                 "episode": self.video_info.get("episode"),
-                "firstAired": self.video_info.get("firstaired")
+                "firstAired": self.video_info.get("firstaired"),
+                "uniqueIds": fix_unique_ids(self.video_info.get("tvshow", {}).get("uniqueid", {}), self.video_info.get("type"))
             }
         elif full_data["mediaType"] == "movie":
             full_data = full_data | {
@@ -71,14 +72,20 @@ class PlayerMonitor(xbmc.Player):
             xbmc.log("Request failed for URL {}: {}".format(url, str(exception)), level=xbmc.LOGERROR)
             self.show_message("HTTP request failed!")
 
-    def onAVStarted(self):
+    def fetch_video_info(self):
         try:
-            self.video_info = jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}).get("item")
+            self.video_info = jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["tvshowid", "showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}).get("item")
         except:
             self.video_info = None
 
         if not self.video_info:
             return
+
+        if self.video_info.get("type") == "episode":
+            self.video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": self.video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
+
+    def onAVStarted(self):
+        self.fetch_video_info()
 
         self.send_request("start")
 

@@ -22,15 +22,12 @@ def jsonrpc_request(method: str, params=None):
     return json.loads(response_json).get("result", {})
 
 
-def fix_unique_ids(video_info: dict):
-    unique_ids = video_info.get("uniqueid", {})
-
+def fix_unique_ids(unique_ids: dict, media_type: str):
     if len(unique_ids.keys()) == 1:
         unique_id = unique_ids.get("unknown")
 
         # unique_ids only contains the "unknown" property
         if unique_id is not None and unique_id != "":
-            media_type = video_info.get("type")
             if media_type == "episode":
                 unique_ids["tvdb"] = unique_id
             elif media_type == "movie":
