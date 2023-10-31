@@ -7,6 +7,8 @@ import xbmcgui
 
 from requests.auth import HTTPBasicAuth
 
+from resources.lib.utils import get_unique_ids
+
 
 class PlayerMonitor(xbmc.Player):
     def __init__(self):
@@ -27,7 +29,8 @@ class PlayerMonitor(xbmc.Player):
             "mediaType": self.video_info.getMediaType(),
             "imdbId": self.video_info.getIMDBNumber(),
             "year": self.video_info.getYear(),
-            "originalTitle": self.video_info.getOriginalTitle()
+            "originalTitle": self.video_info.getOriginalTitle(),
+            "uniqueIds": get_unique_ids(self.video_info)
         }
 
         if full_data["mediaType"] == "episode":
