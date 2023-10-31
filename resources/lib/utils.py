@@ -1,24 +1,42 @@
+import json
+
 import xbmc
 
 
-def get_unique_ids(video_info: xbmc.InfoTagVideo):
-    ids = {}
+def jsonrpc_request(method: str, params=None):
+    request = {
+        "jsonrpc": "2.0",
+        "method": method,
+        "id": 1
+    }
 
-    imdb_id = video_info.getIMDBNumber()
-    if imdb_id is not None and imdb_id.startswith("tt"):
-        ids["imdb"] = imdb_id
+    if params is not None:
+        request["params"] = params
 
-    for provider in ("imdb", "tvdb", "tmdb", "anidb"):
-        unique_id = video_info.getUniqueID(provider)
+    request_json = json.dumps(request)
+
+    xbmc.log("Sending JSON-RPC request: {}".format(request_json), level=xbmc.LOGDEBUG)
+    response_json = xbmc.executeJSONRPC(request_json)
+    xbmc.log("Response from JSON-RPC request: {}".format(response_json), level=xbmc.LOGDEBUG)
+
+    return json.loads(response_json).get("result", {})
+
+
+def fix_unique_ids(video_info: dict):
+    unique_ids = video_info.get("uniqueid", {})
+
+    if len(unique_ids.keys()) == 1:
+        unique_id = unique_ids.get("unknown")
+
+        # unique_ids only contains the "unknown" property
         if unique_id is not None and unique_id != "":
-            ids[provider] = unique_id
+            media_type = video_info.get("type")
+            if media_type == "episode":
+                unique_ids["tvdb"] = unique_id
+            elif media_type == "movie":
+                unique_ids["tmdb"] = unique_id
 
-    unique_id = video_info.getUniqueID("unknown")
-    if unique_id is not None and unique_id != "":
-        media_type = video_info.getMediaType()
-        if media_type == "episode":
-            ids["tvdb"] = unique_id
-        elif media_type == "movie":
-            ids["tmdb"] = unique_id
+            # Remove "unknown" property
+            del unique_ids["unknown"]
 
-    return ids
+    return unique_ids

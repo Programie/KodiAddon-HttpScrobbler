@@ -7,14 +7,14 @@ import xbmcgui
 
 from requests.auth import HTTPBasicAuth
 
-from resources.lib.utils import get_unique_ids
+from resources.lib.utils import jsonrpc_request, fix_unique_ids
 
 
 class PlayerMonitor(xbmc.Player):
     def __init__(self):
         super().__init__()
 
-        self.video_info: xbmc.InfoTagVideo | None = None
+        self.video_info = {}
 
     def show_message(self, message: str):
         xbmcgui.Dialog().ok("HTTP Scrobbler", message)
@@ -24,21 +24,23 @@ class PlayerMonitor(xbmc.Player):
             return None
 
         full_data = {
-            "dbId": self.video_info.getDbId(),
-            "title": self.video_info.getTitle(),
-            "mediaType": self.video_info.getMediaType(),
-            "imdbId": self.video_info.getIMDBNumber(),
-            "year": self.video_info.getYear(),
-            "originalTitle": self.video_info.getOriginalTitle(),
-            "uniqueIds": get_unique_ids(self.video_info)
+            "dbId": self.video_info.get("id"),
+            "title": self.video_info.get("label"),
+            "mediaType": self.video_info.get("type"),
+            "year": self.video_info.get("year"),
+            "uniqueIds": fix_unique_ids(self.video_info)
         }
 
         if full_data["mediaType"] == "episode":
             full_data = full_data | {
-                "tvShowTitle": self.video_info.getTVShowTitle(),
-                "season": self.video_info.getSeason(),
-                "episode": self.video_info.getEpisode(),
-                "firstAired": self.video_info.getFirstAiredAsW3C()
+                "tvShowTitle": self.video_info.get("showtitle"),
+                "season": self.video_info.get("season"),
+                "episode": self.video_info.get("episode"),
+                "firstAired": self.video_info.get("firstaired")
+            }
+        elif full_data["mediaType"] == "movie":
+            full_data = full_data | {
+                "premiered": self.video_info.get("premiered")
             }
 
         return full_data
@@ -71,7 +73,7 @@ class PlayerMonitor(xbmc.Player):
 
     def onAVStarted(self):
         try:
-            self.video_info = self.getVideoInfoTag()
+            self.video_info = jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}).get("item")
         except:
             self.video_info = None
 
