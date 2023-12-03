@@ -28,7 +28,10 @@ def fix_unique_ids(unique_ids: dict, media_type: str):
 
         # unique_ids only contains the "unknown" property
         if unique_id is not None and unique_id != "":
-            if media_type == "episode":
+            if isinstance(unique_id, str) and unique_id.startswith("tt"):
+                # ID starting with "tt" is an IMDb ID
+                unique_ids["imdb"] = unique_id
+            elif media_type == "episode":
                 unique_ids["tvdb"] = unique_id
             elif media_type == "movie":
                 unique_ids["tmdb"] = unique_id
