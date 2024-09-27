@@ -4,6 +4,12 @@ This addon for Kodi provides a simple scrobbler sending requests for movies and 
 
 Work on a [backend for this addon](https://github.com/Programie/Tracky) is currently in progress.
 
+## Installation
+
+Just [download the this repository](https://github.com/Programie/KodiAddon-HttpScrobbler/archive/refs/heads/main.zip) as zip archive and install it in Kodi using "Install from zip file" in the add-on browser (Settings > Addons).
+
+After that, configure the backend, username and password in the Addon settings.
+
 ## Data structure
 
 The following examples provide the usual structure which will be used for sending the data to the endpoint.
