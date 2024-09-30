@@ -19,11 +19,12 @@ class PlayerMonitor(xbmc.Player):
     def show_message(self, message: str):
         xbmcgui.Dialog().ok("HTTP Scrobbler", message)
 
-    def build_payload(self):
+    def build_payload(self, event: str):
         if not self.video_info:
             return None
 
         full_data = {
+            "event": event,
             "dbId": self.video_info.get("id"),
             "title": self.video_info.get("label"),
             "mediaType": self.video_info.get("type"),
@@ -32,7 +33,8 @@ class PlayerMonitor(xbmc.Player):
         }
 
         if full_data["mediaType"] == "episode":
-            full_data = full_data | {
+            full_data = {
+                **full_data,
                 "tvShowTitle": self.video_info.get("showtitle"),
                 "season": self.video_info.get("season"),
                 "episode": self.video_info.get("episode"),
@@ -40,14 +42,15 @@ class PlayerMonitor(xbmc.Player):
                 "uniqueIds": fix_unique_ids(self.video_info.get("tvshow", {}).get("uniqueid", {}), self.video_info.get("type"))
             }
         elif full_data["mediaType"] == "movie":
-            full_data = full_data | {
+            full_data = {
+                **full_data,
                 "premiered": self.video_info.get("premiered")
             }
 
         return full_data
 
     def send_request(self, event: str):
-        json_data = {"event": event} | self.build_payload()
+        json_data = self.build_payload(event)
 
         url = xbmcaddon.Addon().getSetting("url")
         if not url:
