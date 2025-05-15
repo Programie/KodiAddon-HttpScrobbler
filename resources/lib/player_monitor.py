@@ -23,13 +23,26 @@ class PlayerMonitor(xbmc.Player):
         if not self.video_info:
             return None
 
+        total_time = self.getTotalTime() if self.isPlaying() else None
+        current_time = self.getTime() if self.isPlaying() else None
+
+        if total_time and total_time > 0 and current_time and current_time > 0:
+            progress_percent = (current_time / total_time) * 100
+        else:
+            progress_percent = None
+
         full_data = {
             "event": event,
             "dbId": self.video_info.get("id"),
             "title": self.video_info.get("label"),
             "mediaType": self.video_info.get("type"),
             "year": self.video_info.get("year"),
-            "uniqueIds": fix_unique_ids(self.video_info.get("uniqueid", {}), self.video_info.get("type"))
+            "uniqueIds": fix_unique_ids(self.video_info.get("uniqueid", {}), self.video_info.get("type")),
+            "duration": total_time,
+            "progress": {
+                "time": current_time,
+                "percent": progress_percent
+            }
         }
 
         if full_data["mediaType"] == "episode":
