@@ -26,7 +26,19 @@ class PlayerMonitor(xbmc.Player):
         total_time = self.getTotalTime() if self.isPlaying() else None
         current_time = self.getTime() if self.isPlaying() else None
 
-        if total_time and total_time > 0 and current_time and current_time > 0:
+        if total_time is not None:
+            if total_time < 0:
+                total_time = 0
+            else:
+                total_time = int(total_time)
+
+        if current_time is not None:
+            if current_time < 0:
+                current_time = 0
+            else:
+                current_time = int(current_time)
+
+        if total_time and current_time is not None:
             progress_percent = (current_time / total_time) * 100
         else:
             progress_percent = None
