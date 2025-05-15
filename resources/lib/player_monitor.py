@@ -7,6 +7,7 @@ import xbmcgui
 
 from requests.auth import HTTPBasicAuth
 
+from resources.lib.timer import Timer
 from resources.lib.utils import jsonrpc_request, fix_unique_ids
 
 
@@ -14,10 +15,18 @@ class PlayerMonitor(xbmc.Player):
     def __init__(self):
         super().__init__()
 
+        self.settings = None
+        self.interval_timer = None
+
         self.video_info = {}
+
+        self.load_settings()
 
     def show_message(self, message: str):
         xbmcgui.Dialog().ok("HTTP Scrobbler", message)
+
+    def load_settings(self):
+        self.settings = xbmcaddon.Addon().getSettings()
 
     def build_payload(self, event: str):
         if not self.video_info:
@@ -77,14 +86,14 @@ class PlayerMonitor(xbmc.Player):
     def send_request(self, event: str):
         json_data = self.build_payload(event)
 
-        url = xbmcaddon.Addon().getSetting("url")
+        url = self.settings.getString("url")
         if not url:
             xbmc.log("HTTP Scrobbler URL not configured!", level=xbmc.LOGERROR)
             self.show_message("HTTP Scrobbler URL not configured!")
             return
 
-        username = xbmcaddon.Addon().getSetting("username")
-        password = xbmcaddon.Addon().getSetting("password")
+        username = self.settings.getString("username")
+        password = self.settings.getString("password")
 
         if username or password:
             auth = HTTPBasicAuth(username, password)
@@ -112,31 +121,55 @@ class PlayerMonitor(xbmc.Player):
         if self.video_info.get("type") == "episode":
             self.video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": self.video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
 
+    def start_interval_timer(self):
+        if not self.settings.getBool("useInterval"):
+            return
+
+        self.interval_timer = Timer(self.settings.getInt("interval"), self.onInterval)
+        self.interval_timer.start()
+
+    def stop_interval_timer(self):
+        if not self.interval_timer or not self.interval_timer.is_alive():
+            return
+
+        self.interval_timer.stop()
+
     def onAVStarted(self):
         self.fetch_video_info()
 
         self.send_request("start")
+        self.start_interval_timer()
 
     def onPlayBackPaused(self):
         if not self.video_info:
             return
 
         self.send_request("pause")
+        self.stop_interval_timer()
 
     def onPlayBackResumed(self):
         if not self.video_info:
             return
 
         self.send_request("resume")
+        self.start_interval_timer()
 
     def onPlayBackStopped(self):
         if not self.video_info:
             return
 
         self.send_request("stop")
+        self.stop_interval_timer()
 
     def onPlayBackEnded(self):
         if not self.video_info:
             return
 
         self.send_request("end")
+        self.stop_interval_timer()
+
+    def onInterval(self):
+        if not self.video_info:
+            return
+
+        self.send_request("interval")

@@ -1,11 +1,10 @@
 import xbmc
 
-from resources.lib.player_monitor import PlayerMonitor
+from resources.lib.main_monitor import MainMonitor
 
 
 def main():
-    monitor = xbmc.Monitor()
-    player_monitor = PlayerMonitor()
+    monitor = MainMonitor()
 
     xbmc.log("Starting HTTP Scrobbler", level=xbmc.LOGINFO)
 
