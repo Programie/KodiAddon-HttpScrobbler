@@ -28,6 +28,11 @@ Not all of those properties might be set in every request as they might not be a
   "premiered": "",
   "uniqueIds": {
     "imdb": "tt0088763"
+  },
+  "duration": 6960,
+  "progress": {
+    "time": 0,
+    "percent": 0.0
   }
 }
 ```
@@ -43,6 +48,11 @@ Not all of those properties might be set in every request as they might not be a
   "year": 2016,
   "uniqueIds": {
     "tvdb": "75897"
+  },
+  "duration": 1330,
+  "progress": {
+    "time": 0,
+    "percent": 0.0
   },
   "tvShowTitle": "South Park",
   "season": 20,
