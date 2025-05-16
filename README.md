@@ -6,7 +6,7 @@ Work on a [backend for this addon](https://github.com/Programie/Tracky) is curre
 
 ## Installation
 
-Just [download this repository](https://github.com/Programie/KodiAddon-HttpScrobbler/archive/refs/heads/main.zip) as zip archive and install it in Kodi using "Install from zip file" in the add-on browser (Settings > Addons).
+Just [download this repository](https://github.com/Programie/KodiAddon-HttpScrobbler/archive/refs/heads/main.zip) as zip archive and install it in Kodi using "Install from zip file" in the add-on browser (Settings > Addons). NOTE requires "Enable Unknown Sources" to be enabled first.
 
 After that, configure the backend, username and password in the Addon settings.
 
