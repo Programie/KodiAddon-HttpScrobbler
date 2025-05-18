@@ -168,6 +168,18 @@ class PlayerMonitor(xbmc.Player):
         self.send_request("end")
         self.stop_interval_timer()
 
+    def onPlayBackSeek(self, time: int, seekOffset: int):
+        if not self.video_info:
+            return
+
+        self.send_request("seek")
+
+    def onPlayBackSeekChapter(self, chapter: int):
+        if not self.video_info:
+            return
+
+        self.send_request("seek")
+
     def onInterval(self):
         if not self.video_info:
             return

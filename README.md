@@ -27,6 +27,7 @@ Available values for the `event` property:
 | resume   | Resume playback after pausing it                            |
 | stop     | Playback stopped (not finished)                             |
 | end      | Playback has finished (not stopped before reaching the end) |
+| seek     | Triggered after jumping to a specific time or chapter       |
 | interval | Triggered while playback in configured interval             |
 
 ### Playback progress reporting
