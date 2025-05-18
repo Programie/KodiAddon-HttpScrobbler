@@ -107,7 +107,7 @@ class PlayerMonitor(xbmc.Player):
             response.raise_for_status()
         except Exception as exception:
             xbmc.log("Request failed for URL {}: {}".format(url, str(exception)), level=xbmc.LOGERROR)
-            self.show_message("HTTP request failed!")
+            self.show_message("HTTP request failed for {}".format(url))
 
     def fetch_video_info(self):
         try:
