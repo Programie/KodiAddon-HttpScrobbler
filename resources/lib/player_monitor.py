@@ -3,7 +3,6 @@ import json
 import requests
 import xbmc
 import xbmcaddon
-import xbmcgui
 
 from requests.auth import HTTPBasicAuth
 
@@ -23,7 +22,7 @@ class PlayerMonitor(xbmc.Player):
         self.load_settings()
 
     def show_message(self, message: str):
-        xbmcgui.Dialog().ok("HTTP Scrobbler", message)
+        jsonrpc_request("GUI.ShowNotification", {"title": "HTTP Scrobbler", "message": message})
 
     def load_settings(self):
         self.settings = xbmcaddon.Addon().getSettings()
