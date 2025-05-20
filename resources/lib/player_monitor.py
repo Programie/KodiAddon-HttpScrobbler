@@ -83,6 +83,9 @@ class PlayerMonitor(xbmc.Player):
         return full_data
 
     def send_request(self, event: str):
+        if not self.settings.getBool("event.{}".format(event)):
+            return
+
         json_data = self.build_payload(event)
 
         url = self.settings.getString("url")

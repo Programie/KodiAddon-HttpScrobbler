@@ -20,15 +20,17 @@ Additionally to that, it's also possible to regularly send the current progress 
 
 Available values for the `event` property:
 
-| Event    | Description                                                 |
-|----------|-------------------------------------------------------------|
-| start    | Start playback                                              |
-| pause    | Pause playback                                              |
-| resume   | Resume playback after pausing it                            |
-| stop     | Playback stopped (not finished)                             |
-| end      | Playback has finished (not stopped before reaching the end) |
-| seek     | Triggered after jumping to a specific time or chapter       |
-| interval | Triggered while playback in configured interval             |
+| Event    | Description                                             |
+|----------|---------------------------------------------------------|
+| start    | Start playback                                          |
+| pause    | Pause playback                                          |
+| resume   | Resume playback after pausing it                        |
+| stop     | Playback stopped (not finished)                         |
+| end      | Playback finished (not stopped before reaching the end) |
+| seek     | Triggered after jumping to a specific time or chapter   |
+| interval | Triggered while playback in configured interval         |
+
+Each event can be enabled or disabled individually in the addon settings.
 
 ### Playback progress reporting
 
