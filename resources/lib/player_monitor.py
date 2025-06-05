@@ -31,6 +31,14 @@ class PlayerMonitor(xbmc.Player):
         if not self.video_info:
             return None
 
+        media_type = self.video_info.get("type")
+
+        try:
+            if not self.settings.getBool("mediatype.{}".format(media_type)):
+                return None
+        except TypeError:
+            return None
+
         total_time = self.getTotalTime() if self.isPlaying() else None
         current_time = self.getTime() if self.isPlaying() else None
 
@@ -55,9 +63,9 @@ class PlayerMonitor(xbmc.Player):
             "event": event,
             "dbId": self.video_info.get("id"),
             "title": self.video_info.get("label"),
-            "mediaType": self.video_info.get("type"),
+            "mediaType": media_type,
             "year": self.video_info.get("year"),
-            "uniqueIds": fix_unique_ids(self.video_info.get("uniqueid", {}), self.video_info.get("type")),
+            "uniqueIds": fix_unique_ids(self.video_info.get("uniqueid", {}), media_type),
             "duration": total_time,
             "progress": {
                 "time": current_time,
@@ -65,14 +73,14 @@ class PlayerMonitor(xbmc.Player):
             }
         }
 
-        if full_data["mediaType"] == "episode":
+        if media_type == "episode":
             full_data = {
                 **full_data,
                 "tvShowTitle": self.video_info.get("showtitle"),
                 "season": self.video_info.get("season"),
                 "episode": self.video_info.get("episode"),
                 "firstAired": self.video_info.get("firstaired"),
-                "uniqueIds": fix_unique_ids(self.video_info.get("tvshow", {}).get("uniqueid", {}), self.video_info.get("type"))
+                "uniqueIds": fix_unique_ids(self.video_info.get("tvshow", {}).get("uniqueid", {}), media_type)
             }
         elif full_data["mediaType"] == "movie":
             full_data = {
@@ -87,6 +95,8 @@ class PlayerMonitor(xbmc.Player):
             return
 
         json_data = self.build_payload(event)
+        if not json_data:
+            return
 
         url = self.settings.getString("url")
         if not url:

@@ -17,5 +17,9 @@
         <setting label="Scrobble in defined interval" type="lsep"/>
         <setting label="Enable" type="bool" id="event.interval" default="true"/>
         <setting label="Interval (seconds)" type="number" id="interval" default="10" enable="eq(-1,true)"/>
+
+        <setting label="Scrobble types" type="lsep"/>
+        <setting label="Movies" type="bool" id="mediatype.movie" default="true"/>
+        <setting label="Episodes (TV shows)" type="bool" id="mediatype.episode" default="true"/>
     </category>
 </settings>
