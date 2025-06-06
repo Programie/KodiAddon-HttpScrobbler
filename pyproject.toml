@@ -1,0 +1,9 @@
+[project]
+name = "kodiaddon-httpscrobbler"
+version = "1.0.0"
+description = " A simple scrobbler addon for Kodi"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "kodistubs>=21.0.0",
+]

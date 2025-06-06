@@ -1,0 +1,23 @@
+version = 1
+revision = 2
+requires-python = ">=3.12"
+
+[[package]]
+name = "kodiaddon-httpscrobbler"
+version = "1.0.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "kodistubs" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "kodistubs", specifier = ">=21.0.0" }]
+
+[[package]]
+name = "kodistubs"
+version = "21.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/24/bc/5cf6fcb211cfcfe572b48897140806c88d2c2ab7597d51dcac2313950304/Kodistubs-21.0.0.tar.gz", hash = "sha256:2c342eebf6c85c690788e6a4156a76d8eaa21b4e19e73df601ced0ca28d23576", size = 69842, upload-time = "2024-04-07T13:44:08.103Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/68/7ebaa78fa4ffe81e373419de1aa0aaa5a5f92b378ec616d7696646eecc87/Kodistubs-21.0.0-py3-none-any.whl", hash = "sha256:b82cf094648ad5c75cf532bc377e1255c71730011d23d664b7df8ac96aedd3e0", size = 71378, upload-time = "2024-04-07T13:44:06.109Z" },
+]
