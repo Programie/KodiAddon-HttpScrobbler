@@ -13,10 +13,10 @@
         <setting label="Playback stopped (not finished)" type="bool" id="event.stop" default="true"/>
         <setting label="Playback finished (not stopped before reaching the end)" type="bool" id="event.end" default="true"/>
         <setting label="After seeking" type="bool" id="event.seek" default="true"/>
+        <setting label="Interval" type="bool" id="event.interval" default="true"/>
 
-        <setting label="Scrobble in defined interval" type="lsep"/>
-        <setting label="Enable" type="bool" id="event.interval" default="true"/>
-        <setting label="Interval (seconds)" type="number" id="interval" default="10" enable="eq(-1,true)"/>
+        <setting label="Update interval" type="lsep"/>
+        <setting label="Interval (seconds)" type="number" id="interval" default="10"/>
 
         <setting label="Scrobble types" type="lsep"/>
         <setting label="Movies" type="bool" id="mediatype.movie" default="true"/>

@@ -17,6 +17,9 @@ class PlayerMonitor(xbmc.Player):
         self.settings = None
         self.interval_timer = None
 
+        self.total_time = None
+        self.current_time = None
+
         self.video_info = {}
 
         self.load_settings()
@@ -39,8 +42,8 @@ class PlayerMonitor(xbmc.Player):
         except TypeError:
             return None
 
-        total_time = self.getTotalTime() if self.isPlaying() else None
-        current_time = self.getTime() if self.isPlaying() else None
+        total_time = self.getTotalTime() if self.isPlaying() else self.total_time
+        current_time = self.getTime() if self.isPlaying() else self.current_time
 
         if total_time is not None:
             if total_time < 0:
@@ -134,9 +137,6 @@ class PlayerMonitor(xbmc.Player):
             self.video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": self.video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
 
     def start_interval_timer(self):
-        if not self.settings.getBool("event.interval"):
-            return
-
         self.interval_timer = Timer(self.settings.getInt("interval"), self.onInterval)
         self.interval_timer.start()
 
@@ -145,6 +145,10 @@ class PlayerMonitor(xbmc.Player):
             return
 
         self.interval_timer.stop()
+
+    def update_time(self):
+        self.total_time = self.getTotalTime() if self.isPlaying() else None
+        self.current_time = self.getTime() if self.isPlaying() else None
 
     def onAVStarted(self):
         self.fetch_video_info()
@@ -184,16 +188,19 @@ class PlayerMonitor(xbmc.Player):
         if not self.video_info:
             return
 
+        self.update_time()
         self.send_request("seek")
 
     def onPlayBackSeekChapter(self, chapter: int):
         if not self.video_info:
             return
 
+        self.update_time()
         self.send_request("seek")
 
     def onInterval(self):
         if not self.video_info:
             return
 
+        self.update_time()
         self.send_request("interval")

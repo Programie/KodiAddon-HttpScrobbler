@@ -34,7 +34,7 @@ Each event can be enabled or disabled individually in the addon settings.
 
 ### Playback progress reporting
 
-The `progress` property is especially useful in combination with the `interval` event as it contains the current playback progress.
+The `progress` property is especially useful in combination with the `interval` event as it contains the current playback progress. But the progress is also included in other events like `pause`, `seek` or `stop`.
 
 There are two properties in the `progress` map:
 
@@ -43,7 +43,7 @@ There are two properties in the `progress` map:
 
 Additional to that, the `duration` property in the root contains the total runtime in seconds of the played back media.
 
-**Note:** The duration as well as the progress time and percent information are only available while the playback is active (i.e. not available in the `end` event).
+**Note:** As the current time as well as the total time are not available anymore in the `stop` as well as in the `end` event, the last known values are used instead. Those values are updated regularly (based on the interval also used for the `interval` event).
 
 ### Data structure
 
