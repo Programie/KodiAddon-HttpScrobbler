@@ -137,6 +137,7 @@ class PlayerMonitor(xbmc.Player):
             self.video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": self.video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
 
     def start_interval_timer(self):
+        self.stop_interval_timer()
         self.interval_timer = Timer(self.settings.getInt("interval"), self.onInterval)
         self.interval_timer.start()
 
