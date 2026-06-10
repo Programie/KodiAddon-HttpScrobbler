@@ -83,7 +83,7 @@ class PlayerMonitor(xbmc.Player):
                 "season": self.video_info.get("season"),
                 "episode": self.video_info.get("episode"),
                 "firstAired": self.video_info.get("firstaired"),
-                "uniqueIds": fix_unique_ids(self.video_info.get("tvshow", {}).get("uniqueid", {}), media_type)
+                "tvShowUniqueIds": fix_unique_ids(self.video_info.get("tvshow", {}).get("uniqueid", {}), media_type)
             }
         elif full_data["mediaType"] == "movie":
             full_data = {
@@ -137,6 +137,7 @@ class PlayerMonitor(xbmc.Player):
             self.video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": self.video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
 
     def start_interval_timer(self):
+        self.stop_interval_timer()
         self.interval_timer = Timer(self.settings.getInt("interval"), self.onInterval)
         self.interval_timer.start()
 
@@ -155,6 +156,9 @@ class PlayerMonitor(xbmc.Player):
 
         self.send_request("start")
         self.start_interval_timer()
+
+    def onAVChange(self):
+        self.update_time()
 
     def onPlayBackPaused(self):
         if not self.video_info:
