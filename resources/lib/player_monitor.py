@@ -157,6 +157,9 @@ class PlayerMonitor(xbmc.Player):
         self.send_request("start")
         self.start_interval_timer()
 
+    def onAVChange(self):
+        self.update_time()
+
     def onPlayBackPaused(self):
         if not self.video_info:
             return
