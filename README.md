@@ -82,7 +82,7 @@ Not all of those properties might be set in every request as they might not be a
   "mediaType": "episode",
   "year": 2016,
   "uniqueIds": {
-    "tvdb": "75897"
+    "tvdb": "5654976"
   },
   "duration": 1330,
   "progress": {
@@ -92,6 +92,9 @@ Not all of those properties might be set in every request as they might not be a
   "tvShowTitle": "South Park",
   "season": 20,
   "episode": 1,
-  "firstAired": "2016-09-14"
+  "firstAired": "2016-09-14",
+  "tvShowUniqueIds": {
+    "tvdb": "75897"
+  }
 }
 ```
