@@ -42,8 +42,8 @@ class PlayerMonitor(xbmc.Player):
         except TypeError:
             return None
 
-        total_time = self.getTotalTime() if self.isPlaying() else self.total_time
-        current_time = self.getTime() if self.isPlaying() else self.current_time
+        total_time = self.total_time
+        current_time = self.current_time
 
         if total_time is not None:
             if total_time < 0:
@@ -154,6 +154,7 @@ class PlayerMonitor(xbmc.Player):
     def onAVStarted(self):
         self.fetch_video_info()
 
+        self.update_time()
         self.send_request("start")
         self.start_interval_timer()
 
@@ -164,6 +165,7 @@ class PlayerMonitor(xbmc.Player):
         if not self.video_info:
             return
 
+        self.update_time()
         self.send_request("pause")
         self.stop_interval_timer()
 
@@ -171,6 +173,7 @@ class PlayerMonitor(xbmc.Player):
         if not self.video_info:
             return
 
+        self.update_time()
         self.send_request("resume")
         self.start_interval_timer()
 
