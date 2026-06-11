@@ -161,7 +161,7 @@ class PlayerMonitor(xbmc.Player):
 
     def onAVChange(self):
         current_video_info = self.fetch_video_info()
-        if current_video_info != self.video_info:
+        if self.video_info and current_video_info != self.video_info:
             # Video stream change we need to send a stop first
             self.send_request("stop")
             self.stop_interval_timer()
@@ -188,6 +188,7 @@ class PlayerMonitor(xbmc.Player):
             return
 
         self.send_request("stop")
+        self.video_info = None
         self.stop_interval_timer()
 
     def onPlayBackEnded(self):
@@ -198,6 +199,7 @@ class PlayerMonitor(xbmc.Player):
         self.current_time = self.total_time
 
         self.send_request("end")
+        self.video_info = None
         self.stop_interval_timer()
 
     def onPlayBackSeek(self, time: int, seekOffset: int):
