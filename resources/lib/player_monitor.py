@@ -126,15 +126,16 @@ class PlayerMonitor(xbmc.Player):
 
     def fetch_video_info(self):
         try:
-            self.video_info = jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["tvshowid", "showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}).get("item")
+            video_info = jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["tvshowid", "showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}).get("item")
         except:
-            self.video_info = None
+            video_info = None
 
-        if not self.video_info:
+        if not video_info:
             return
 
-        if self.video_info.get("type") == "episode":
-            self.video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": self.video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
+        if video_info.get("type") == "episode":
+            video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
+        return video_info
 
     def start_interval_timer(self):
         self.stop_interval_timer()
@@ -152,13 +153,19 @@ class PlayerMonitor(xbmc.Player):
         self.current_time = self.getTime() if self.isPlaying() else None
 
     def onAVStarted(self):
-        self.fetch_video_info()
+        self.video_info = self.fetch_video_info()
 
         self.update_time()
         self.send_request("start")
         self.start_interval_timer()
 
     def onAVChange(self):
+        current_video_info = self.fetch_video_info()
+        if current_video_info != self.video_info:
+            # Video stream change we need to send a stop first
+            self.send_request("stop")
+            self.stop_interval_timer()
+            self.video_info = self.fetch_video_info()   # Prevents multiple "stop" events.
         self.update_time()
 
     def onPlayBackPaused(self):
@@ -173,7 +180,6 @@ class PlayerMonitor(xbmc.Player):
         if not self.video_info:
             return
 
-        self.update_time()
         self.send_request("resume")
         self.start_interval_timer()
 
