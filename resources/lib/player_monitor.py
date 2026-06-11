@@ -188,6 +188,9 @@ class PlayerMonitor(xbmc.Player):
         if not self.video_info:
             return
 
+        # Force the progress to be 100%, not what the last interval update was.
+        self.current_time = self.total_time
+
         self.send_request("end")
         self.stop_interval_timer()
 
