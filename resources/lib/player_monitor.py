@@ -1,3 +1,5 @@
+import datetime
+import uuid
 import json
 
 import requests
@@ -19,6 +21,7 @@ class PlayerMonitor(xbmc.Player):
 
         self.total_time = None
         self.current_time = None
+        self.session_id = None
 
         self.video_info = {}
 
@@ -29,6 +32,9 @@ class PlayerMonitor(xbmc.Player):
 
     def load_settings(self):
         self.settings = xbmcaddon.Addon().getSettings()
+
+    def generate_session_id(self):
+        self.session_id = uuid.uuid4()
 
     def build_payload(self, event: str):
         if not self.video_info:
@@ -63,6 +69,8 @@ class PlayerMonitor(xbmc.Player):
             progress_percent = None
 
         full_data = {
+            "timestamp": datetime.datetime.now().astimezone().isoformat(),
+            "sessionId": self.session_id,
             "event": event,
             "dbId": self.video_info.get("id"),
             "title": self.video_info.get("label"),
@@ -155,6 +163,7 @@ class PlayerMonitor(xbmc.Player):
     def onAVStarted(self):
         self.video_info = self.fetch_video_info()
 
+        self.generate_session_id()
         self.update_time()
         self.send_request("start")
         self.start_interval_timer()

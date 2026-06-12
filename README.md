@@ -55,6 +55,8 @@ Not all of those properties might be set in every request as they might not be a
 
 ```json
 {
+  "timestamp": "2026-06-12T20:16:35.185714+02:00",
+  "sessionId": "dee95eeb-00c1-48f5-9ddd-ae6b7f063d47",
   "event": "start",
   "dbId": 123,
   "title": "Back to the Future",
@@ -76,6 +78,8 @@ Not all of those properties might be set in every request as they might not be a
 
 ```json
 {
+  "timestamp": "2026-06-12T19:07:42.637621+02:00",
+  "sessionId": "39c8a16c-a000-4cb5-9e10-1840a0e4e4a3",
   "event": "start",
   "dbId": 1234,
   "title": "Member Berries",
