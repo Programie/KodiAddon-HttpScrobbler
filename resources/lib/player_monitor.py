@@ -1,23 +1,29 @@
 import datetime
 import uuid
-import json
-
-import requests
 import xbmc
 import xbmcaddon
+import xbmcvfs
 
+from pathlib import Path
 from requests.auth import HTTPBasicAuth
-
+from resources.lib.queue_processor import QueueProcessor
 from resources.lib.timer import Timer
-from resources.lib.utils import jsonrpc_request, fix_unique_ids
+from resources.lib.utils import jsonrpc_request, fix_unique_ids, show_message
 
 
 class PlayerMonitor(xbmc.Player):
     def __init__(self):
         super().__init__()
 
+        addon = xbmcaddon.Addon()
+
+        profile_dir = Path(xbmcvfs.translatePath(addon.getAddonInfo("profile")))
+        if not profile_dir.is_dir():
+            profile_dir.mkdir()
+
         self.settings = None
         self.interval_timer = None
+        self.queue_processor = QueueProcessor(profile_dir.joinpath("queue.db"))
 
         self.total_time = None
         self.current_time = None
@@ -27,11 +33,20 @@ class PlayerMonitor(xbmc.Player):
 
         self.load_settings()
 
-    def show_message(self, message: str):
-        jsonrpc_request("GUI.ShowNotification", {"title": "HTTP Scrobbler", "message": message})
+        self.queue_processor.start()
 
     def load_settings(self):
         self.settings = xbmcaddon.Addon().getSettings()
+
+        self.queue_processor.http_worker.url = self.settings.getString("url")
+
+        username = self.settings.getString("username")
+        password = self.settings.getString("password")
+
+        if username or password:
+            self.queue_processor.http_worker.auth = HTTPBasicAuth(username, password)
+        else:
+            self.queue_processor.http_worker.auth = None
 
     def generate_session_id(self):
         self.session_id = uuid.uuid4()
@@ -112,25 +127,10 @@ class PlayerMonitor(xbmc.Player):
         url = self.settings.getString("url")
         if not url:
             xbmc.log("HTTP Scrobbler URL not configured!", level=xbmc.LOGERROR)
-            self.show_message("HTTP Scrobbler URL not configured!")
+            show_message("HTTP Scrobbler URL not configured!")
             return
 
-        username = self.settings.getString("username")
-        password = self.settings.getString("password")
-
-        if username or password:
-            auth = HTTPBasicAuth(username, password)
-        else:
-            auth = None
-
-        xbmc.log("Sending data to URL {}: {}".format(url, json.dumps(json_data)), level=xbmc.LOGINFO)
-
-        try:
-            response = requests.post(url, json=json_data, auth=auth)
-            response.raise_for_status()
-        except Exception as exception:
-            xbmc.log("Request failed for URL {}: {}".format(url, str(exception)), level=xbmc.LOGERROR)
-            self.show_message("HTTP request failed for {}".format(url))
+        self.queue_processor.queue_handler.add_event(json_data)
 
     def fetch_video_info(self):
         try:
@@ -174,7 +174,7 @@ class PlayerMonitor(xbmc.Player):
             # Video stream change we need to send a stop first
             self.send_request("stop")
             self.stop_interval_timer()
-            self.video_info = self.fetch_video_info()   # Prevents multiple "stop" events.
+            self.video_info = self.fetch_video_info()  # Prevents multiple "stop" events.
         self.update_time()
 
     def onPlayBackPaused(self):
@@ -231,3 +231,7 @@ class PlayerMonitor(xbmc.Player):
 
         self.update_time()
         self.send_request("interval")
+
+    def onAbortRequested(self):
+        self.queue_processor.stop()
+        self.queue_processor.join()

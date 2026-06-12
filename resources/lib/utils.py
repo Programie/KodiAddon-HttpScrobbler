@@ -22,6 +22,10 @@ def jsonrpc_request(method: str, params=None):
     return json.loads(response_json).get("result", {})
 
 
+def show_message(message: str):
+    jsonrpc_request("GUI.ShowNotification", {"title": "HTTP Scrobbler", "message": message})
+
+
 def fix_unique_ids(unique_ids: dict, media_type: str):
     if len(unique_ids.keys()) == 1:
         unique_id = unique_ids.get("unknown")

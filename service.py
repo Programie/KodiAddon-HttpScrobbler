@@ -12,6 +12,8 @@ def main():
 
     xbmc.log("Stopping HTTP Scrobbler", level=xbmc.LOGINFO)
 
+    monitor.player_monitor.onAbortRequested()
+
 
 if __name__ == '__main__':
     main()
