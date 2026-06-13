@@ -9,7 +9,7 @@ from requests.auth import HTTPBasicAuth
 
 from resources.lib.enums import EventType
 from resources.lib.queue_processor import QueueProcessor
-from resources.lib.timer import Timer
+from resources.lib.thread_utils import Timer
 from resources.lib.utils import jsonrpc_request, fix_unique_ids, show_message
 
 
