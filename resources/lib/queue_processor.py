@@ -91,6 +91,9 @@ class Database:
     def mark_as_skipped(self, session_id: str) -> None:
         self.execute_write_query("UPDATE event_queue SET status = :status WHERE session_id = :session_id", {"status": Status.SKIPPED.value, "session_id": session_id})
 
+    def mark_failed_as_pending(self):
+        self.execute_write_query("UPDATE event_queue SET status = :pending_status WHERE status = :failed_status", {"pending_status": Status.PENDING.value, "failed_status": Status.FAILED.value})
+
 
 class ThreadLoop(threading.Thread, ABC):
     def __init__(self) -> None:
@@ -102,6 +105,8 @@ class ThreadLoop(threading.Thread, ABC):
         self.stop_event.set()
 
     def run(self) -> None:
+        self.on_start()
+
         while not self.stop_event.is_set():
             if not self.loop():
                 self.stop_event.wait(1)
@@ -110,6 +115,9 @@ class ThreadLoop(threading.Thread, ABC):
 
     @abstractmethod
     def loop(self) -> bool:
+        pass
+
+    def on_start(self) -> None:
         pass
 
     def on_stop(self) -> None:
@@ -134,6 +142,10 @@ class QueueHandler(ThreadLoop):
             self.process_request_queue(),
             self.process_response_queue()
         )
+
+    def on_start(self) -> None:
+        # Mark failed events as pending to retry them
+        self.database.mark_failed_as_pending()
 
     def on_stop(self) -> None:
         self.database.close()
