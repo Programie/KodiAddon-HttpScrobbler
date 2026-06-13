@@ -7,17 +7,10 @@ import xbmc
 
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
-
 from requests.auth import AuthBase
 
-
-class Status(Enum):
-    DONE = 0
-    PENDING = 1
-    PROCESSING = 2
-    FAILED = 3
+from resources.lib.enums import Status, EventType
 
 
 @dataclass

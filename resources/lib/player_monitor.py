@@ -6,6 +6,8 @@ import xbmcvfs
 
 from pathlib import Path
 from requests.auth import HTTPBasicAuth
+
+from resources.lib.enums import EventType
 from resources.lib.queue_processor import QueueProcessor
 from resources.lib.timer import Timer
 from resources.lib.utils import jsonrpc_request, fix_unique_ids, show_message
@@ -51,7 +53,7 @@ class PlayerMonitor(xbmc.Player):
     def generate_session_id(self):
         self.session_id = str(uuid.uuid4())
 
-    def build_payload(self, event: str):
+    def build_payload(self, event_type: EventType):
         if not self.video_info:
             return None
 
@@ -86,7 +88,7 @@ class PlayerMonitor(xbmc.Player):
         full_data = {
             "timestamp": datetime.datetime.now().astimezone().isoformat(),
             "sessionId": self.session_id,
-            "event": event,
+            "event": event_type.value,
             "dbId": self.video_info.get("id"),
             "title": self.video_info.get("label"),
             "mediaType": media_type,
@@ -116,11 +118,11 @@ class PlayerMonitor(xbmc.Player):
 
         return full_data
 
-    def send_request(self, event: str):
-        if not self.settings.getBool("event.{}".format(event)):
+    def send_request(self, event_type: EventType):
+        if not self.settings.getBool("event.{}".format(event_type.value)):
             return
 
-        json_data = self.build_payload(event)
+        json_data = self.build_payload(event_type)
         if not json_data:
             return
 
@@ -165,14 +167,14 @@ class PlayerMonitor(xbmc.Player):
 
         self.generate_session_id()
         self.update_time()
-        self.send_request("start")
+        self.send_request(EventType.START)
         self.start_interval_timer()
 
     def onAVChange(self):
         current_video_info = self.fetch_video_info()
         if self.video_info and current_video_info != self.video_info:
             # Video stream change we need to send a stop first
-            self.send_request("stop")
+            self.send_request(EventType.STOP)
             self.stop_interval_timer()
             self.video_info = self.fetch_video_info()  # Prevents multiple "stop" events.
         self.update_time()
@@ -182,21 +184,21 @@ class PlayerMonitor(xbmc.Player):
             return
 
         self.update_time()
-        self.send_request("pause")
+        self.send_request(EventType.PAUSE)
         self.stop_interval_timer()
 
     def onPlayBackResumed(self):
         if not self.video_info:
             return
 
-        self.send_request("resume")
+        self.send_request(EventType.RESUME)
         self.start_interval_timer()
 
     def onPlayBackStopped(self):
         if not self.video_info:
             return
 
-        self.send_request("stop")
+        self.send_request(EventType.STOP)
         self.video_info = None
         self.stop_interval_timer()
 
@@ -207,7 +209,7 @@ class PlayerMonitor(xbmc.Player):
         # Force the progress to be 100%, not what the last interval update was.
         self.current_time = self.total_time
 
-        self.send_request("end")
+        self.send_request(EventType.END)
         self.video_info = None
         self.stop_interval_timer()
 
@@ -216,21 +218,21 @@ class PlayerMonitor(xbmc.Player):
             return
 
         self.update_time()
-        self.send_request("seek")
+        self.send_request(EventType.SEEK)
 
     def onPlayBackSeekChapter(self, chapter: int):
         if not self.video_info:
             return
 
         self.update_time()
-        self.send_request("seek")
+        self.send_request(EventType.SEEK)
 
     def onInterval(self):
         if not self.video_info:
             return
 
         self.update_time()
-        self.send_request("interval")
+        self.send_request(EventType.INTERVAL)
 
     def onAbortRequested(self):
         self.queue_processor.stop()
