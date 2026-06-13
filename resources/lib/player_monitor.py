@@ -241,5 +241,6 @@ class PlayerMonitor(xbmc.Player):
         self.send_request(EventType.INTERVAL)
 
     def onAbortRequested(self) -> None:
+        self.stop_interval_timer()
         self.queue_processor.stop()
         self.queue_processor.join()
