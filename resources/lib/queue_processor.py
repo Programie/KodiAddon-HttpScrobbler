@@ -21,7 +21,7 @@ class QueueItem:
 
 
 class Database:
-    def __init__(self, file_path: Path):
+    def __init__(self, file_path: Path) -> None:
         self.lock = threading.Lock()
         self.connection = sqlite3.connect(file_path, check_same_thread=False)
 
@@ -31,7 +31,7 @@ class Database:
         self.connection.execute("PRAGMA synchronous=NORMAL;")
         self.connection.execute("PRAGMA temp_store=MEMORY;")
 
-    def init_db(self):
+    def init_db(self) -> None:
         # @formatter:off
         query = """
             CREATE TABLE IF NOT EXISTS event_queue
@@ -50,21 +50,21 @@ class Database:
 
         self.connection.executescript(query)
 
-    def close(self):
+    def close(self) -> None:
         self.connection.close()
 
-    def execute_write_query(self, query: str, params: dict | None = None):
+    def execute_write_query(self, query: str, params: dict | None = None) -> None:
         with self.lock:
             self.connection.execute(query, params or {})
             self.connection.commit()
 
-    def execute_read_query(self, query: str, params: dict | None = None):
+    def execute_read_query(self, query: str, params: dict | None = None) -> sqlite3.Cursor:
         return self.connection.execute(query, params or {})
 
-    def clear_session(self, session_id: str):
+    def clear_session(self, session_id: str) -> None:
         self.execute_write_query("DELETE FROM event_queue WHERE session_id = :session_id", {"session_id": session_id})
 
-    def add_event(self, event_data: dict):
+    def add_event(self, event_data: dict) -> None:
         self.execute_write_query("INSERT INTO event_queue (session_id, type, payload, created_at, status) VALUES (:session_id, :type, :payload, :created_at, :status)", {
             "session_id": event_data.get("sessionId"),
             "type": event_data.get("event"),
@@ -82,26 +82,26 @@ class Database:
 
         return QueueItem(id=row["id"], status=Status.PROCESSING, event=json.loads(row["payload"]))
 
-    def mark_as_done(self, event_id: int):
+    def mark_as_done(self, event_id: int) -> None:
         self.execute_write_query("DELETE FROM event_queue WHERE id = :id", {"id": event_id})
 
-    def mark_as_failed(self, event_id: int):
+    def mark_as_failed(self, event_id: int) -> None:
         self.execute_write_query("UPDATE event_queue SET status = :status WHERE id = :id", {"status": Status.FAILED.value, "id": event_id})
 
-    def mark_as_skipped(self, session_id: str):
+    def mark_as_skipped(self, session_id: str) -> None:
         self.execute_write_query("UPDATE event_queue SET status = :status WHERE session_id = :session_id", {"status": Status.SKIPPED.value, "session_id": session_id})
 
 
 class ThreadLoop(threading.Thread, ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.stop_event = threading.Event()
 
-    def stop(self):
+    def stop(self) -> None:
         self.stop_event.set()
 
-    def run(self):
+    def run(self) -> None:
         while not self.stop_event.is_set():
             if not self.loop():
                 self.stop_event.wait(1)
@@ -112,12 +112,12 @@ class ThreadLoop(threading.Thread, ABC):
     def loop(self) -> bool:
         pass
 
-    def on_stop(self):
+    def on_stop(self) -> None:
         pass
 
 
 class QueueHandler(ThreadLoop):
-    def __init__(self, database_filepath: Path):
+    def __init__(self, database_filepath: Path) -> None:
         super().__init__()
 
         self.database = Database(database_filepath)
@@ -135,13 +135,13 @@ class QueueHandler(ThreadLoop):
             self.process_response_queue()
         )
 
-    def on_stop(self):
+    def on_stop(self) -> None:
         self.database.close()
 
-    def add_event(self, event_data: dict):
+    def add_event(self, event_data: dict) -> None:
         self.input_queue.put(event_data)
 
-    def process_input_queue(self):
+    def process_input_queue(self) -> bool:
         try:
             event = self.input_queue.get_nowait()
 
@@ -151,7 +151,7 @@ class QueueHandler(ThreadLoop):
         except queue.Empty:
             return False
 
-    def process_request_queue(self):
+    def process_request_queue(self) -> bool:
         queue_item = self.database.claim_next_event()
         if not queue_item:
             return False
@@ -159,7 +159,7 @@ class QueueHandler(ThreadLoop):
         self.request_queue.put(queue_item)
         return True
 
-    def process_response_queue(self):
+    def process_response_queue(self) -> bool:
         try:
             queue_item = self.response_queue.get_nowait()
 
@@ -179,7 +179,7 @@ class QueueHandler(ThreadLoop):
 
 
 class HTTPWorker(ThreadLoop):
-    def __init__(self, request_queue: queue.Queue[QueueItem], response_queue: queue.Queue[QueueItem]):
+    def __init__(self, request_queue: queue.Queue[QueueItem], response_queue: queue.Queue[QueueItem]) -> None:
         super().__init__()
 
         self.request_queue = request_queue
@@ -206,7 +206,7 @@ class HTTPWorker(ThreadLoop):
         except queue.Empty:
             return False
 
-    def process_request(self, event_data: dict):
+    def process_request(self, event_data: dict) -> bool:
         xbmc.log(f"Sending data to URL {self.url}: {event_data}", level=xbmc.LOGINFO)
 
         try:
@@ -219,18 +219,18 @@ class HTTPWorker(ThreadLoop):
 
 
 class QueueProcessor:
-    def __init__(self, database_filepath: Path):
+    def __init__(self, database_filepath: Path) -> None:
         self.queue_handler = QueueHandler(database_filepath)
         self.http_worker = HTTPWorker(request_queue=self.queue_handler.request_queue, response_queue=self.queue_handler.response_queue)
 
-    def start(self):
+    def start(self) -> None:
         self.queue_handler.start()
         self.http_worker.start()
 
-    def stop(self):
+    def stop(self) -> None:
         self.queue_handler.stop()
         self.http_worker.stop()
 
-    def join(self):
+    def join(self) -> None:
         self.queue_handler.join()
         self.http_worker.join()

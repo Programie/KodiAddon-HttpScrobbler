@@ -14,7 +14,7 @@ from resources.lib.utils import jsonrpc_request, fix_unique_ids, show_message
 
 
 class PlayerMonitor(xbmc.Player):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         addon = xbmcaddon.Addon()
@@ -37,7 +37,7 @@ class PlayerMonitor(xbmc.Player):
 
         self.queue_processor.start()
 
-    def load_settings(self):
+    def load_settings(self) -> None:
         self.settings = xbmcaddon.Addon().getSettings()
 
         self.queue_processor.http_worker.url = self.settings.getString("url")
@@ -50,14 +50,16 @@ class PlayerMonitor(xbmc.Player):
         else:
             self.queue_processor.http_worker.auth = None
 
-    def generate_session_id(self):
+    def generate_session_id(self) -> None:
         self.session_id = str(uuid.uuid4())
 
-    def build_payload(self, event_type: EventType):
+    def build_payload(self, event_type: EventType) -> dict | None:
         if not self.video_info:
             return None
 
         media_type = self.video_info.get("type")
+        if not isinstance(media_type, str):
+            return None
 
         try:
             if not self.settings.getBool("mediatype.{}".format(media_type)):
@@ -118,7 +120,7 @@ class PlayerMonitor(xbmc.Player):
 
         return full_data
 
-    def send_request(self, event_type: EventType):
+    def send_request(self, event_type: EventType) -> None:
         if not self.settings.getBool("event.{}".format(event_type.value)):
             return
 
@@ -134,35 +136,35 @@ class PlayerMonitor(xbmc.Player):
 
         self.queue_processor.queue_handler.add_event(json_data)
 
-    def fetch_video_info(self):
+    def fetch_video_info(self) -> dict | None:
         try:
             video_info = jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["tvshowid", "showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}).get("item")
         except:
             video_info = None
 
-        if not video_info:
-            return
+        if not video_info or not isinstance(video_info, dict):
+            return None
 
         if video_info.get("type") == "episode":
             video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
         return video_info
 
-    def start_interval_timer(self):
+    def start_interval_timer(self) -> None:
         self.stop_interval_timer()
         self.interval_timer = Timer(self.settings.getInt("interval"), self.onInterval)
         self.interval_timer.start()
 
-    def stop_interval_timer(self):
+    def stop_interval_timer(self) -> None:
         if not self.interval_timer or not self.interval_timer.is_alive():
             return
 
         self.interval_timer.stop()
 
-    def update_time(self):
+    def update_time(self) -> None:
         self.total_time = self.getTotalTime() if self.isPlaying() else None
         self.current_time = self.getTime() if self.isPlaying() else None
 
-    def onAVStarted(self):
+    def onAVStarted(self) -> None:
         self.video_info = self.fetch_video_info()
 
         self.generate_session_id()
@@ -170,7 +172,7 @@ class PlayerMonitor(xbmc.Player):
         self.send_request(EventType.START)
         self.start_interval_timer()
 
-    def onAVChange(self):
+    def onAVChange(self) -> None:
         current_video_info = self.fetch_video_info()
         if self.video_info and current_video_info != self.video_info:
             # Video stream change we need to send a stop first
@@ -179,7 +181,7 @@ class PlayerMonitor(xbmc.Player):
             self.video_info = self.fetch_video_info()  # Prevents multiple "stop" events.
         self.update_time()
 
-    def onPlayBackPaused(self):
+    def onPlayBackPaused(self) -> None:
         if not self.video_info:
             return
 
@@ -187,14 +189,14 @@ class PlayerMonitor(xbmc.Player):
         self.send_request(EventType.PAUSE)
         self.stop_interval_timer()
 
-    def onPlayBackResumed(self):
+    def onPlayBackResumed(self) -> None:
         if not self.video_info:
             return
 
         self.send_request(EventType.RESUME)
         self.start_interval_timer()
 
-    def onPlayBackStopped(self):
+    def onPlayBackStopped(self) -> None:
         if not self.video_info:
             return
 
@@ -202,7 +204,7 @@ class PlayerMonitor(xbmc.Player):
         self.video_info = None
         self.stop_interval_timer()
 
-    def onPlayBackEnded(self):
+    def onPlayBackEnded(self) -> None:
         if not self.video_info:
             return
 
@@ -213,27 +215,27 @@ class PlayerMonitor(xbmc.Player):
         self.video_info = None
         self.stop_interval_timer()
 
-    def onPlayBackSeek(self, time: int, seekOffset: int):
+    def onPlayBackSeek(self, time: int, seekOffset: int) -> None:
         if not self.video_info:
             return
 
         self.update_time()
         self.send_request(EventType.SEEK)
 
-    def onPlayBackSeekChapter(self, chapter: int):
+    def onPlayBackSeekChapter(self, chapter: int) -> None:
         if not self.video_info:
             return
 
         self.update_time()
         self.send_request(EventType.SEEK)
 
-    def onInterval(self):
+    def onInterval(self) -> None:
         if not self.video_info:
             return
 
         self.update_time()
         self.send_request(EventType.INTERVAL)
 
-    def onAbortRequested(self):
+    def onAbortRequested(self) -> None:
         self.queue_processor.stop()
         self.queue_processor.join()

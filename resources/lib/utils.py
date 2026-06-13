@@ -1,9 +1,10 @@
 import json
-
 import xbmc
 
+from typing import Any
 
-def jsonrpc_request(method: str, params=None):
+
+def jsonrpc_request(method: str, params=None) -> Any:
     request = {
         "jsonrpc": "2.0",
         "method": method,
@@ -22,11 +23,11 @@ def jsonrpc_request(method: str, params=None):
     return json.loads(response_json).get("result", {})
 
 
-def show_message(message: str):
+def show_message(message: str) -> None:
     jsonrpc_request("GUI.ShowNotification", {"title": "HTTP Scrobbler", "message": message})
 
 
-def fix_unique_ids(unique_ids: dict, media_type: str):
+def fix_unique_ids(unique_ids: dict, media_type: str) -> dict:
     if len(unique_ids.keys()) == 1:
         unique_id = unique_ids.get("unknown")
 
