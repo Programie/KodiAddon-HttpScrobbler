@@ -10,6 +10,38 @@ Just [download this repository](https://github.com/Programie/KodiAddon-HttpScrob
 
 After that, configure the backend, username and password in the Addon settings.
 
+## Settings
+
+Most settings should be easy to understand, but the error handling section might require more details:
+
+### Retry unfinished requests on startup
+
+In case a request is ongoing while Kodi has been shutdown or even crashed, the sent event is stored in the queue as "processing" (i.e. not pending and not successful or failed).
+
+The request might already arrived at the configured server but it could also be dropped due to the connection beeing closed before actually sending the data.
+
+This setting is enabled by default.
+
+### Retry failed requests on startup
+
+In case a request fails (i.e. due to a timeout or another non-OK status code), the event is kept as "failed" in the queue.
+
+Enabling this setting retries those failed events on the next addon initialization (i.e. the next Kodi start or if the addon is disabled and enabled again).
+
+This setting is disabled by default.
+
+### Skip all events after sending stop/end
+
+In some cases, sending an event like "start", "pause", "resume" or "interval" might fail due to network issues. But the "stop" or "end" event might successfully arrive.
+
+With the normal behavior, those failed events are resent on startup if the setting "Retry failed requests on startup" is enabled.
+
+This might give unexpected results due to events like "start" arriving after the previous "stop" or "end" event resulting in the backend service thinking that the user is currently watching something even if that's not the case.
+
+Note: Skipped events are never processed automatically and have to be processed manually (check the SQLite database `queue.db` in the data directory of the addon).
+
+This setting is disabled by default.
+
 ## Data sent to the endpoint
 
 The addon sends a HTTP POST request containing a JSON payload.

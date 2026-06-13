@@ -22,4 +22,9 @@
         <setting label="Movies" type="bool" id="mediatype.movie" default="true"/>
         <setting label="Episodes (TV shows)" type="bool" id="mediatype.episode" default="true"/>
     </category>
+    <category label="Error handling">
+        <setting label="Retry unfinished requests on startup" type="bool" id="errorhandling.retry_unfinished_on_startup" default="true"/>
+        <setting label="Retry failed requests on startup" type="bool" id="errorhandling.retry_failed_on_startup" default="false"/>
+        <setting label="Skip all events after sending stop/end" type="bool" id="errorhandling.mark_events_as_skipped_on_stop" default="false"/>
+    </category>
 </settings>

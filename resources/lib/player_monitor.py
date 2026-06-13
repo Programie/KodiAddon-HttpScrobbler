@@ -50,6 +50,10 @@ class PlayerMonitor(xbmc.Player):
         else:
             self.queue_processor.http_worker.auth = None
 
+        self.queue_processor.queue_handler.settings.retry_unfinished_on_startup = self.settings.getBool("errorhandling.retry_unfinished_on_startup")
+        self.queue_processor.queue_handler.settings.retry_failed_on_startup = self.settings.getBool("errorhandling.retry_failed_on_startup")
+        self.queue_processor.queue_handler.settings.mark_events_as_skipped_on_stop = self.settings.getBool("errorhandling.mark_events_as_skipped_on_stop")
+
     def generate_session_id(self) -> None:
         self.session_id = str(uuid.uuid4())
 

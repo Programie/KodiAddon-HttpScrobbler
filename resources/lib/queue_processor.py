@@ -20,6 +20,12 @@ class QueueItem:
     event: dict
 
 
+class Settings:
+    retry_unfinished_on_startup = False
+    retry_failed_on_startup = False
+    mark_events_as_skipped_on_stop = False
+
+
 class Database:
     def __init__(self, file_path: Path) -> None:
         self.lock = threading.Lock()
@@ -91,6 +97,9 @@ class Database:
     def mark_as_skipped(self, session_id: str) -> None:
         self.execute_write_query("UPDATE event_queue SET status = :status WHERE session_id = :session_id", {"status": Status.SKIPPED.value, "session_id": session_id})
 
+    def mark_processing_as_pending(self):
+        self.execute_write_query("UPDATE event_queue SET status = :pending_status WHERE status = :processing_status", {"pending_status": Status.PENDING.value, "processing_status": Status.PROCESSING.value})
+
     def mark_failed_as_pending(self):
         self.execute_write_query("UPDATE event_queue SET status = :pending_status WHERE status = :failed_status", {"pending_status": Status.PENDING.value, "failed_status": Status.FAILED.value})
 
@@ -107,6 +116,9 @@ class QueueHandler(ThreadLoop):
         self.request_queue: queue.Queue[QueueItem] = queue.Queue()
         self.response_queue: queue.Queue[QueueItem] = queue.Queue()
 
+        # Settings set from outside
+        self.settings = Settings()
+
     def loop(self) -> bool:
         return max(
             self.process_input_queue(),
@@ -115,8 +127,13 @@ class QueueHandler(ThreadLoop):
         )
 
     def on_start(self) -> None:
-        # Mark failed events as pending to retry them
-        self.database.mark_failed_as_pending()
+        if self.settings.retry_unfinished_on_startup:
+            # Mark events in status "processing" as pending to retry them
+            self.database.mark_processing_as_pending()
+
+        if self.settings.retry_failed_on_startup:
+            # Mark failed events as pending to retry them
+            self.database.mark_failed_as_pending()
 
     def on_stop(self) -> None:
         self.database.close()
@@ -149,10 +166,11 @@ class QueueHandler(ThreadLoop):
             if queue_item.status == Status.DONE:
                 self.database.mark_as_done(queue_item.id)
 
-                # Mark any remaining events of the same session as skipped to prevent resending them automatically
-                session_id: str | None = queue_item.event.get("sessionId")
-                if EventType(queue_item.event.get("event")) in [EventType.STOP, EventType.END] and session_id:
-                    self.database.mark_as_skipped(session_id)
+                if self.settings.mark_events_as_skipped_on_stop:
+                    # Mark any remaining events of the same session as skipped to prevent resending them automatically
+                    session_id: str | None = queue_item.event.get("sessionId")
+                    if EventType(queue_item.event.get("event")) in [EventType.STOP, EventType.END] and session_id:
+                        self.database.mark_as_skipped(session_id)
             else:
                 self.database.mark_as_failed(queue_item.id)
 
