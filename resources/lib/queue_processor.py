@@ -125,6 +125,7 @@ class QueueHandler(ThreadLoop):
         super().__init__()
 
         self.database = Database(database_filepath)
+        self.database.init_db()
 
         # Queues
         self.input_queue: queue.Queue[dict] = queue.Queue()
