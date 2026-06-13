@@ -34,7 +34,7 @@ class PlayerMonitor(xbmc.Player):
         self.settings = xbmcaddon.Addon().getSettings()
 
     def generate_session_id(self):
-        self.session_id = uuid.uuid4()
+        self.session_id = str(uuid.uuid4())
 
     def build_payload(self, event: str):
         if not self.video_info:
