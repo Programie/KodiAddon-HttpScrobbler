@@ -88,6 +88,9 @@ class Database:
     def mark_as_failed(self, event_id: int):
         self.execute_write_query("UPDATE event_queue SET status = :status WHERE id = :id", {"status": Status.FAILED.value, "id": event_id})
 
+    def mark_as_skipped(self, session_id: str):
+        self.execute_write_query("UPDATE event_queue SET status = :status WHERE session_id = :session_id", {"status": Status.SKIPPED.value, "session_id": session_id})
+
 
 class ThreadLoop(threading.Thread, ABC):
     def __init__(self):
@@ -162,6 +165,11 @@ class QueueHandler(ThreadLoop):
 
             if queue_item.status == Status.DONE:
                 self.database.mark_as_done(queue_item.id)
+
+                # Mark any remaining events of the same session as skipped to prevent resending them automatically
+                session_id: str | None = queue_item.event.get("sessionId")
+                if EventType(queue_item.event.get("event")) in [EventType.STOP, EventType.END] and session_id:
+                    self.database.mark_as_skipped(session_id)
             else:
                 self.database.mark_as_failed(queue_item.id)
 

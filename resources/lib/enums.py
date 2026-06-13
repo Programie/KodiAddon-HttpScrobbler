@@ -16,3 +16,4 @@ class Status(IntEnum):
     PENDING = 1
     PROCESSING = 2
     FAILED = 3
+    SKIPPED = 4
