@@ -7,7 +7,9 @@
     <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
         <platform>all</platform>
-        <summary lang="en">Simple HTTP Scrobbler</summary>
-        <description lang="en">Track watched TV shows and movies via a HTTP endpoint</description>
+        <summary lang="en_GB">Simple HTTP Scrobbler</summary>
+        <summary lang="de_DE">Einfacher HTTP Scrobbler</summary>
+        <description lang="en_GB">Track watched TV shows and movies via a HTTP endpoint.</description>
+        <description lang="de_DE">Tracke gesehene Serien und Filme über einen HTTP Endpunkt.</description>
     </extension>
 </addon>

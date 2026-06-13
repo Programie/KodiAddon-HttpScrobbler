@@ -1,0 +1,109 @@
+# Kodi Media Center language file
+# Addon Name: HTTP Scrobbler
+# Addon id: service.http-scrobbler
+# Addon Provider: Programie
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: dev@selfcoders.com\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Michael Wieland <dev@selfcoders.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#32000"
+msgid "General"
+msgstr ""
+
+msgctxt "#32001"
+msgid "URL"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Username"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Password"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Scrobbling"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Scrobble at specific events"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Start playback"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Pause playback"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Resume playback after pausing it"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Playback stopped (not finished)"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Playback finished (not stopped before reaching the end)"
+msgstr ""
+
+msgctxt "#32011"
+msgid "After seeking"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Interval"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Update interval"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Interval (seconds)"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Scrobble types"
+msgstr ""
+
+msgctxt "#32016"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#32017"
+msgid "Episodes (TV shows)"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Error handling"
+msgstr ""
+
+msgctxt "#32019"
+msgid "Retry unfinished requests on startup"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Retry failed requests on startup"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Skip all events after sending stop/end"
+msgstr ""
+
+msgctxt "#32022"
+msgid "HTTP Scrobbler URL not configured!"
+msgstr ""

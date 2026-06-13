@@ -17,9 +17,9 @@ class PlayerMonitor(xbmc.Player):
     def __init__(self) -> None:
         super().__init__()
 
-        addon = xbmcaddon.Addon()
+        self.addon = xbmcaddon.Addon()
 
-        profile_dir = Path(xbmcvfs.translatePath(addon.getAddonInfo("profile")))
+        profile_dir = Path(xbmcvfs.translatePath(self.addon.getAddonInfo("profile")))
         if not profile_dir.is_dir():
             profile_dir.mkdir()
 
@@ -38,7 +38,7 @@ class PlayerMonitor(xbmc.Player):
         self.queue_processor.start()
 
     def load_settings(self) -> None:
-        self.settings = xbmcaddon.Addon().getSettings()
+        self.settings = self.addon.getSettings()
 
         self.queue_processor.http_worker.url = self.settings.getString("url")
 
@@ -135,7 +135,7 @@ class PlayerMonitor(xbmc.Player):
         url = self.settings.getString("url")
         if not url:
             xbmc.log("HTTP Scrobbler URL not configured!", level=xbmc.LOGERROR)
-            show_message("HTTP Scrobbler URL not configured!")
+            show_message(self.addon.getLocalizedString(32022))
             return
 
         self.queue_processor.queue_handler.add_event(json_data)
