@@ -51,6 +51,7 @@ class Database:
             );
 
             CREATE INDEX IF NOT EXISTS event_queue_session ON event_queue (session_id);
+            CREATE INDEX IF NOT EXISTS event_queue_status ON event_queue (status);
         """
         # @formatter:on
 
