@@ -182,7 +182,7 @@ class PlayerMonitor(xbmc.Player):
             # Video stream change we need to send a stop first
             self.send_request(EventType.STOP)
             self.stop_interval_timer()
-            self.video_info = self.fetch_video_info()  # Prevents multiple "stop" events.
+            self.video_info = current_video_info  # Prevents multiple "stop" events.
         self.update_time()
 
     def onPlayBackPaused(self) -> None:
