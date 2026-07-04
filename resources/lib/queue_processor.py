@@ -73,6 +73,7 @@ class Database:
         self.execute_write_query("DELETE FROM event_queue WHERE session_id = :session_id", {"session_id": session_id})
 
     def add_event(self, event_data: dict) -> None:
+        log_message(f"Adding event to database: {event_data}", level=xbmc.LOGDEBUG)
         self.execute_write_query("INSERT INTO event_queue (session_id, type, payload, created_at, status) VALUES (:session_id, :type, :payload, :created_at, :status)", {
             "session_id": event_data.get("sessionId"),
             "type": event_data.get("event"),
@@ -91,12 +92,15 @@ class Database:
         return QueueItem(id=row["id"], status=Status.PROCESSING, event=json.loads(row["payload"]))
 
     def mark_as_done(self, event_id: int) -> None:
+        log_message(f"Removing event with ID {event_id} from queue", level=xbmc.LOGDEBUG)
         self.execute_write_query("DELETE FROM event_queue WHERE id = :id", {"id": event_id})
 
     def mark_as_failed(self, event_id: int) -> None:
+        log_message(f"Marking event with ID {event_id} as failed", level=xbmc.LOGDEBUG)
         self.execute_write_query("UPDATE event_queue SET status = :status WHERE id = :id", {"status": Status.FAILED.value, "id": event_id})
 
     def mark_as_skipped(self, session_id: str) -> None:
+        log_message(f"Marking events of session {session_id} as skipped", level=xbmc.LOGDEBUG)
         self.execute_write_query("UPDATE event_queue SET status = :status WHERE session_id = :session_id", {"status": Status.SKIPPED.value, "session_id": session_id})
 
     def mark_processing_as_pending(self):
@@ -141,6 +145,7 @@ class QueueHandler(ThreadLoop):
         self.database.close()
 
     def add_event(self, event_data: dict) -> None:
+        log_message(f"Adding event to queue: {event_data}", level=xbmc.LOGDEBUG)
         self.input_queue.put(event_data)
 
     def process_input_queue(self) -> bool:
