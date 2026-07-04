@@ -10,7 +10,7 @@ from requests.auth import HTTPBasicAuth
 from resources.lib.enums import EventType
 from resources.lib.queue_processor import QueueProcessor
 from resources.lib.thread_utils import Timer
-from resources.lib.utils import jsonrpc_request, fix_unique_ids, show_message
+from resources.lib.utils import jsonrpc_request, fix_unique_ids, show_message, log_message
 
 
 class PlayerMonitor(xbmc.Player):
@@ -134,7 +134,7 @@ class PlayerMonitor(xbmc.Player):
 
         url = self.settings.getString("url")
         if not url:
-            xbmc.log("HTTP Scrobbler URL not configured!", level=xbmc.LOGERROR)
+            log_message("URL not configured!", level=xbmc.LOGERROR)
             show_message(self.addon.getLocalizedString(32022))
             return
 

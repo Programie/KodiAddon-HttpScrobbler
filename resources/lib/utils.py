@@ -16,9 +16,9 @@ def jsonrpc_request(method: str, params=None) -> Any:
 
     request_json = json.dumps(request)
 
-    xbmc.log("Sending JSON-RPC request: {}".format(request_json), level=xbmc.LOGDEBUG)
+    log_message(f"Sending JSON-RPC request: {request_json}", level=xbmc.LOGDEBUG)
     response_json = xbmc.executeJSONRPC(request_json)
-    xbmc.log("Response from JSON-RPC request: {}".format(response_json), level=xbmc.LOGDEBUG)
+    log_message(f"Response from JSON-RPC request: {request_json}", level=xbmc.LOGDEBUG)
 
     return json.loads(response_json).get("result", {})
 
@@ -45,3 +45,7 @@ def fix_unique_ids(unique_ids: dict, media_type: str) -> dict:
             del unique_ids["unknown"]
 
     return unique_ids
+
+
+def log_message(message: str, level: int):
+    xbmc.log(msg=f"HTTP Scrobbler: {message}", level=level)

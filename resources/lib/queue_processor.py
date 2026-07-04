@@ -11,6 +11,7 @@ from requests.auth import AuthBase
 
 from resources.lib.enums import Status, EventType
 from resources.lib.thread_utils import ThreadLoop
+from resources.lib.utils import log_message
 
 
 @dataclass
@@ -209,14 +210,14 @@ class HTTPWorker(ThreadLoop):
             return False
 
     def process_request(self, event_data: dict) -> bool:
-        xbmc.log(f"Sending data to URL {self.url}: {event_data}", level=xbmc.LOGINFO)
+        log_message(f"Sending data to URL {self.url}: {event_data}", level=xbmc.LOGINFO)
 
         try:
             response = requests.post(url=str(self.url), json=event_data, auth=self.auth, timeout=5)
             response.raise_for_status()
             return True
         except Exception as exception:
-            xbmc.log(f"Request failed for URL {self.url}: {exception}", level=xbmc.LOGERROR)
+            log_message(f"Request failed for URL {self.url}: {exception}", level=xbmc.LOGERROR)
             return False
 
 
