@@ -99,7 +99,7 @@ class PlayerMonitor(xbmc.Player):
             "title": self.video_info.get("label"),
             "mediaType": media_type,
             "year": self.video_info.get("year"),
-            "uniqueIds": fix_unique_ids(self.video_info.get("uniqueid", {}), media_type),
+            "uniqueIds": fix_unique_ids(self.video_info.get("uniqueid") or {}, media_type),
             "duration": total_time,
             "progress": {
                 "time": current_time,
@@ -114,7 +114,7 @@ class PlayerMonitor(xbmc.Player):
                 "season": self.video_info.get("season"),
                 "episode": self.video_info.get("episode"),
                 "firstAired": self.video_info.get("firstaired"),
-                "tvShowUniqueIds": fix_unique_ids(self.video_info.get("tvshow", {}).get("uniqueid", {}), media_type)
+                "tvShowUniqueIds": fix_unique_ids((self.video_info.get("tvshow") or {}).get("uniqueid") or {}, media_type)
             }
         elif full_data["mediaType"] == "movie":
             full_data = {
@@ -142,7 +142,7 @@ class PlayerMonitor(xbmc.Player):
 
     def fetch_video_info(self) -> dict | None:
         try:
-            video_info = jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["tvshowid", "showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}).get("item")
+            video_info = (jsonrpc_request("Player.GetItem", {"playerid": 1, "properties": ["tvshowid", "showtitle", "season", "episode", "firstaired", "premiered", "year", "uniqueid"]}) or {}).get("item")
         except:
             video_info = None
 
@@ -150,7 +150,7 @@ class PlayerMonitor(xbmc.Player):
             return None
 
         if video_info.get("type") == "episode":
-            video_info["tvshow"] = jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": video_info.get("tvshowid"), "properties": ["uniqueid"]}).get("tvshowdetails")
+            video_info["tvshow"] = (jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": video_info.get("tvshowid"), "properties": ["uniqueid"]}) or {}).get("tvshowdetails")
         return video_info
 
     def start_interval_timer(self) -> None:

@@ -20,7 +20,7 @@ def jsonrpc_request(method: str, params=None) -> Any:
     response_json = xbmc.executeJSONRPC(request_json)
     log_message(f"Response from JSON-RPC request: {response_json}", level=xbmc.LOGDEBUG)
 
-    return json.loads(response_json).get("result", {})
+    return json.loads(response_json).get("result")
 
 
 def show_message(message: str) -> None:
