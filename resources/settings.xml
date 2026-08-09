@@ -2,6 +2,7 @@
 <settings>
     <category label="32000">
         <setting label="32001" type="text" id="url" default=""/>
+        <setting label="32027" type="text" id="rating.url" default=""/>
         <setting label="32002" type="text" id="username" default=""/>
         <setting label="32003" type="text" id="password" option="hidden" default=""/>
     </category>
@@ -21,6 +22,18 @@
         <setting label="32015" type="lsep"/>
         <setting label="32016" type="bool" id="mediatype.movie" default="true"/>
         <setting label="32017" type="bool" id="mediatype.episode" default="true"/>
+    </category>
+    <category label="32024">
+        <setting label="32025" type="lsep"/>
+        <setting label="32009" type="bool" id="rating.event.stop" default="false"/>
+        <setting label="32010" type="bool" id="rating.event.end" default="false"/>
+
+        <setting label="32015" type="lsep"/>
+        <setting label="32016" type="bool" id="rating.mediatype.movie" default="true"/>
+        <setting label="32017" type="bool" id="rating.mediatype.episode" default="true"/>
+
+        <setting label="" type="lsep"/>
+        <setting label="32026" type="slider" id="rating.min_percentage" range="0,100" option="percent" default="70"/>
     </category>
     <category label="32018">
         <setting label="32019" type="bool" id="errorhandling.retry_unfinished_on_startup" default="true"/>

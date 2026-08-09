@@ -1,7 +1,9 @@
 import datetime
+import requests
 import uuid
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 
 from pathlib import Path
@@ -57,7 +59,7 @@ class PlayerMonitor(xbmc.Player):
     def generate_session_id(self) -> None:
         self.session_id = str(uuid.uuid4())
 
-    def build_payload(self, event_type: EventType) -> dict | None:
+    def build_payload(self, event_type: EventType, media_type_setting: str) -> dict | None:
         if not self.video_info:
             return None
 
@@ -66,7 +68,7 @@ class PlayerMonitor(xbmc.Player):
             return None
 
         try:
-            if not self.settings.getBool("mediatype.{}".format(media_type)):
+            if not self.settings.getBool(media_type_setting.format(media_type)):
                 return None
         except TypeError:
             return None
@@ -128,7 +130,7 @@ class PlayerMonitor(xbmc.Player):
         if not self.settings.getBool("event.{}".format(event_type.value)):
             return
 
-        json_data = self.build_payload(event_type)
+        json_data = self.build_payload(event_type, media_type_setting="mediatype.{}")
         if not json_data:
             return
 
@@ -139,6 +141,8 @@ class PlayerMonitor(xbmc.Player):
             return
 
         self.queue_processor.queue_handler.add_event(json_data)
+
+        self.ask_and_submit_rating(event_type)
 
     def fetch_video_info(self) -> dict | None:
         try:
@@ -152,6 +156,51 @@ class PlayerMonitor(xbmc.Player):
         if video_info.get("type") == "episode":
             video_info["tvshow"] = (jsonrpc_request("VideoLibrary.GetTVShowDetails", {"tvshowid": video_info.get("tvshowid"), "properties": ["uniqueid"]}) or {}).get("tvshowdetails")
         return video_info
+
+    def ask_and_submit_rating(self, event_type: EventType):
+        if not self.settings.getBool("rating.event.{}".format(event_type.value)):
+            return
+
+        json_data = self.build_payload(event_type, media_type_setting="rating.mediatype.{}")
+        if not json_data:
+            return
+
+        progress = json_data["progress"]["percent"]
+        if progress is None or progress < self.settings.getInt("rating.min_percentage"):
+            return
+
+        url = self.settings.getString("rating.url")
+        username = self.settings.getString("username")
+        password = self.settings.getString("password")
+
+        if not url:
+            log_message("Rating URL not configured!", level=xbmc.LOGERROR)
+            show_message(self.addon.getLocalizedString(32023))
+            return
+
+        rating = xbmcgui.Dialog().select(
+            heading=self.addon.getLocalizedString(32029),
+            list=[f"{rating} – {self.addon.getLocalizedString(32030 + rating)}" for rating in range(11)],
+        )
+
+        if rating < 0:
+            log_message("Rating dialog aborted", xbmc.LOGDEBUG)
+            return
+
+        if username or password:
+            auth = HTTPBasicAuth(username, password)
+        else:
+            auth = None
+
+        json_data["rating"] = rating
+
+        log_message(f"Sending data to URL {url}: {json_data}", level=xbmc.LOGINFO)
+
+        try:
+            response = requests.post(url=str(url), json=json_data, auth=auth, timeout=5)
+            response.raise_for_status()
+        except Exception as exception:
+            log_message(f"Request failed for URL {url}: {exception}", level=xbmc.LOGERROR)
 
     def start_interval_timer(self) -> None:
         self.stop_interval_timer()

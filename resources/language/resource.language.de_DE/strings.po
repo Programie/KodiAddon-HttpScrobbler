@@ -77,8 +77,8 @@ msgid "Interval (seconds)"
 msgstr "Intervall (Sekunden)"
 
 msgctxt "#32015"
-msgid "Scrobble types"
-msgstr "Scrobbletypen"
+msgid "Media types"
+msgstr "Medientypen"
 
 msgctxt "#32016"
 msgid "Movies"
@@ -107,3 +107,71 @@ msgstr "Alle Ereignisse nach stop/end überspringen"
 msgctxt "#32022"
 msgid "HTTP Scrobbler URL not configured!"
 msgstr "HTTP-Scrobbler-URL ist nicht konfiguriert!"
+
+msgctxt "#32023"
+msgid "HTTP Scrobbler URL for ratings not configured!"
+msgstr "HTTP-Scrobbler-URL für Bewertungen ist nicht konfiguriert!"
+
+msgctxt "#32024"
+msgid "Rating"
+msgstr "Bewertung"
+
+msgctxt "#32025"
+msgid "Rate at specific events"
+msgstr "Bei bestimmten Events bewerten"
+
+msgctxt "#32026"
+msgid "Minimum percentage watched"
+msgstr "Mindestens gesehen"
+
+msgctxt "#32027"
+msgid "URL (Bewertungen)"
+msgstr ""
+
+msgctxt "#32029"
+msgid "How did you like it?"
+msgstr "Wie hat es dir gefallen?"
+
+msgctxt "#32030"
+msgid "Terrible"
+msgstr "Schrecklich"
+
+msgctxt "#32031"
+msgid "Very bad"
+msgstr "Sehr schlecht"
+
+msgctxt "#32032"
+msgid "Bad"
+msgstr "Schlecht"
+
+msgctxt "#32033"
+msgid "Below average"
+msgstr "Eher schlecht"
+
+msgctxt "#32034"
+msgid "Under average"
+msgstr "Unterdurchschnittlich"
+
+msgctxt "#32035"
+msgid "Average"
+msgstr "Durchschnittlich"
+
+msgctxt "#32036"
+msgid "Quite good"
+msgstr "Ganz gut"
+
+msgctxt "#32037"
+msgid "Good"
+msgstr "Gut"
+
+msgctxt "#32038"
+msgid "Very good"
+msgstr "Sehr gut"
+
+msgctxt "#32039"
+msgid "Excellent"
+msgstr "Hervorragend"
+
+msgctxt "#32040"
+msgid "Masterpiece"
+msgstr "Meisterwerk"

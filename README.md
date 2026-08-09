@@ -42,6 +42,14 @@ Note: Skipped events are never processed automatically and have to be processed 
 
 This setting is disabled by default.
 
+## Rating
+
+If enabled, the user is asked to rate the watched movie or episode.
+
+A dialog asking for a rating between 0 (terrible) and 10 (masterpiece) is shown after ending the playback.
+
+The data sent to the URL is identical to the scrobble data but contains an additional property `rating` specifying the selected rating as a number between 0 and 10.
+
 ## Data sent to the endpoint
 
 The addon sends a HTTP POST request containing a JSON payload.

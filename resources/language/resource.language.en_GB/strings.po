@@ -77,7 +77,7 @@ msgid "Interval (seconds)"
 msgstr ""
 
 msgctxt "#32015"
-msgid "Scrobble types"
+msgid "Media types"
 msgstr ""
 
 msgctxt "#32016"
@@ -106,4 +106,72 @@ msgstr ""
 
 msgctxt "#32022"
 msgid "HTTP Scrobbler URL not configured!"
+msgstr ""
+
+msgctxt "#32023"
+msgid "HTTP Scrobbler URL for ratings not configured!"
+msgstr ""
+
+msgctxt "#32024"
+msgid "Rating"
+msgstr ""
+
+msgctxt "#32025"
+msgid "Rate at specific events"
+msgstr ""
+
+msgctxt "#32026"
+msgid "Minimum percentage watched"
+msgstr ""
+
+msgctxt "#32027"
+msgid "URL (Ratings)"
+msgstr ""
+
+msgctxt "#32029"
+msgid "How did you like it?"
+msgstr ""
+
+msgctxt "#32030"
+msgid "Terrible"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Very bad"
+msgstr ""
+
+msgctxt "#32032"
+msgid "Bad"
+msgstr ""
+
+msgctxt "#32033"
+msgid "Below average"
+msgstr ""
+
+msgctxt "#32034"
+msgid "Under average"
+msgstr ""
+
+msgctxt "#32035"
+msgid "Average"
+msgstr ""
+
+msgctxt "#32036"
+msgid "Quite good"
+msgstr ""
+
+msgctxt "#32037"
+msgid "Good"
+msgstr ""
+
+msgctxt "#32038"
+msgid "Very good"
+msgstr ""
+
+msgctxt "#32039"
+msgid "Excellent"
+msgstr ""
+
+msgctxt "#32040"
+msgid "Masterpiece"
 msgstr ""
