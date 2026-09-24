@@ -158,6 +158,9 @@ class PlayerMonitor(xbmc.Player):
         return video_info
 
     def ask_and_submit_rating(self, event_type: EventType):
+        if event_type not in [EventType.STOP, EventType.END]:
+            return
+
         if not self.settings.getBool("rating.event.{}".format(event_type.value)):
             return
 
