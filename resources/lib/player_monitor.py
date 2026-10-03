@@ -216,14 +216,29 @@ class PlayerMonitor(xbmc.Player):
 
         self.interval_timer.stop()
 
+    def reset_time(self) -> None:
+        self.total_time = None
+        self.current_time = None
+
     def update_time(self) -> None:
-        self.total_time = self.getTotalTime() if self.isPlaying() else None
-        self.current_time = self.getTime() if self.isPlaying() else None
+        # Keep the last known values if the player is not playing anymore (i.e. while stopping).
+        if not self.isPlaying():
+            return
+
+        try:
+            total_time = self.getTotalTime()
+            current_time = self.getTime()
+        except RuntimeError:
+            return
+
+        self.total_time = total_time
+        self.current_time = current_time
 
     def onAVStarted(self) -> None:
         self.video_info = self.fetch_video_info()
 
         self.generate_session_id()
+        self.reset_time()
         self.update_time()
         self.send_request(EventType.START)
         self.start_interval_timer()
@@ -235,6 +250,7 @@ class PlayerMonitor(xbmc.Player):
             self.send_request(EventType.STOP)
             self.stop_interval_timer()
             self.video_info = current_video_info  # Prevents multiple "stop" events.
+            self.reset_time()
         self.update_time()
 
     def onPlayBackPaused(self) -> None:
@@ -286,7 +302,8 @@ class PlayerMonitor(xbmc.Player):
         self.send_request(EventType.SEEK)
 
     def onInterval(self) -> None:
-        if not self.video_info:
+        # The timer might fire while the player is already closing but before onPlayBackStopped is called.
+        if not self.video_info or not self.isPlaying():
             return
 
         self.update_time()
