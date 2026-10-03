@@ -1,7 +1,7 @@
-from enum import IntEnum, StrEnum
+from enum import Enum, IntEnum
 
 
-class EventType(StrEnum):
+class EventType(str, Enum):
     START = "start"
     PAUSE = "pause"
     RESUME = "resume"
@@ -9,6 +9,9 @@ class EventType(StrEnum):
     END = "end"
     SEEK = "seek"
     INTERVAL = "interval"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class Status(IntEnum):
